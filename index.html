@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FastTyping</title>
+
+  <!-- ИКОНКА ВКЛАДКИ (FAVICON) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%23d97757' stroke-width='8'/><ellipse cx='50' cy='50' rx='48' ry='18' fill='none' stroke='%23d97757' stroke-width='6' transform='rotate(-25 50 50)'/></svg>">
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-color: #1a1514;
+      --card-bg: rgba(35, 28, 26, 0.75);
+      --main-color: #d97757;
+      --main-glow: rgba(217, 119, 87, 0.35);
+      --sub-color: #635652;
+      --text-color: #e3dedb;
+      --error-color: #ff4747;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-ui: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 1.5rem;
+      user-select: none;
+      background-image: radial-gradient(circle at 50% 0%, var(--main-glow) 0%, transparent 60%);
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.25s ease;
+    }
+
+    .logo-container:hover {
+      transform: scale(1.03);
+    }
+
+    .mars-logo {
+      width: 36px;
+      height: 36px;
+      filter: drop-shadow(0 0 8px var(--main-glow));
+      transition: filter 0.3s ease;
+    }
+
+    .logo-container:hover .mars-logo {
+      filter: drop-shadow(0 0 15px var(--main-color));
+    }
+
+    .logo-text {
+      font-family: var(--font-ui);
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text .highlight {
+      color: var(--main-color);
+    }
+
+    .controls-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .config-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .config-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .config-group:not(:last-child)::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 14px;
+      background-color: var(--sub-color);
+      opacity: 0.3;
+      margin-left: 4px;
+    }
+
+    .btn-option {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--sub-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: var(--font-ui);
+      font-size: 0.88rem;
+      font-weight: 700;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-option i {
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .btn-option:hover {
+      color: #ffffff;
+      background: rgba(217, 119, 87, 0.15);
+      border-color: rgba(217, 119, 87, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px var(--main-glow), 0 0 10px rgba(217, 119, 87, 0.2);
+    }
+
+    .btn-option:hover i {
+      transform: scale(1.15) rotate(-5deg);
+      color: var(--main-color);
+    }
+
+    .btn-option.active {
+      background: var(--main-color);
+      color: #000000;
+      border-color: var(--main-color);
+      box-shadow: 0 0 18px var(--main-glow);
+      transform: translateY(0);
+    }
+
+    .btn-option.active i {
+      color: #000000;
+      transform: none;
+    }
+
+    .btn-option.active:hover {
+      background: #e28363;
+      box-shadow: 0 0 25px var(--main-glow);
+      transform: translateY(-1px);
+    }
+
+    main {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stats-bar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 40px;
+      position: relative;
+    }
+
+    .stats-header {
+      font-size: 2rem;
+      color: var(--main-color);
+      font-weight: 700;
+      text-shadow: 0 0 15px var(--main-glow);
+    }
+
+    /* Индикатор Caps Lock между Таймером и Рекордом */
+    .caps-warning {
+      position: absolute;
+      left: 50%;
+      top: -12px;
+      transform: translateX(-50%);
+      background: rgba(217, 119, 87, 0.2);
+      border: 1px solid var(--main-color);
+      color: #ffffff;
+      padding: 4px 14px;
+      border-radius: 8px;
+      font-family: var(--font-ui);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 15px var(--main-glow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .caps-warning.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .best-score-badge {
+      font-family: var(--font-ui);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--sub-color);
+      background: var(--card-bg);
+      padding: 6px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .best-score-badge i { color: var(--main-color); }
+    .best-score-badge span { color: var(--text-color); }
+
+    .test-area-container {
+      position: relative;
+      height: 160px;
+      overflow: hidden;
+      cursor: text;
+    }
+
+    .test-area {
+      position: relative;
+      font-size: 1.85rem;
+      line-height: 2.8rem;
+      word-break: break-word;
+      transition: transform 0.15s ease-out;
+    }
+
+    .words-wrapper {
+      color: var(--sub-color);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65em;
+    }
+
+    .word {
+      display: inline-flex;
+    }
+
+    .letter {
+      position: relative;
+      transition: color 0.08s ease;
+    }
+
+    .letter.correct { color: var(--text-color); }
+    .letter.incorrect { color: var(--error-color); text-decoration: underline; }
+    .letter.extra { color: #d94545; opacity: 0.85; }
+
+    .caret {
+      position: absolute;
+      width: 3px;
+      height: 2rem;
+      background-color: var(--main-color);
+      border-radius: 2px;
+      box-shadow: 0 0 10px var(--main-color), 0 0 18px var(--main-color);
+      transition: left 0.08s ease-out, top 0.08s ease-out;
+      animation: blinkCaret 1.1s infinite;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    @keyframes blinkCaret {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    #hidden-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .restart-btn {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--sub-color);
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin: 15px auto 0;
+      padding: 10px 20px;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-weight: 700;
+    }
+
+    .restart-btn:hover {
+      color: var(--text-color);
+      border-color: var(--main-color);
+      box-shadow: 0 0 15px var(--main-glow);
+      transform: translateY(-2px);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 12, 11, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-card {
+      background: #211b19;
+      border: 1px solid var(--main-color);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 520px;
+      box-shadow: 0 0 35px var(--main-glow);
+      font-family: var(--font-ui);
+      text-align: center;
+    }
+
+    .modal-title { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+    .modal-results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .res-box { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; }
+    .res-box.full { grid-column: span 2; background: var(--main-glow); }
+    .res-label { font-size: 0.8rem; font-weight: 700; color: var(--sub-color); text-transform: uppercase; }
+    .res-val { font-size: 2.2rem; font-weight: 800; color: var(--text-color); }
+    .res-box.full .res-val { font-size: 3.2rem; color: #fff; }
+
+    .modal-btn {
+      background: var(--main-color); color: #000; border: none; width: 100%; padding: 12px;
+      border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn:hover {
+      background: #e28363;
+      box-shadow: 0 0 15px var(--main-glow);
+    }
+
+    footer { color: var(--sub-color); font-size: 0.85rem; font-family: var(--font-ui); text-align: center; }
+    footer key { background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; color: var(--text-color); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container" onclick="initTest()">
+      <svg class="mars-logo" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--main-color)" stroke-width="8"/>
+        <ellipse cx="50" cy="50" rx="48" ry="18" fill="none" stroke="var(--main-color)" stroke-width="6" transform="rotate(-25 50 50)"/>
+      </svg>
+      <h1 class="logo-text">Fast<span class="highlight">Typing</span></h1>
+    </div>
+
+    <div class="controls-wrapper">
+      <div class="config-bar">
+        <div class="config-group">
+          <button class="btn-option" id="lang-ru" onclick="setLanguage('ru')">RU</button>
+          <button class="btn-option" id="lang-en" onclick="setLanguage('en')">EN</button>
+        </div>
+
+        <div class="config-group">
+          <button class="btn-option" id="btn-punctuation" onclick="toggleOption('punctuation')">@ punctuation</button>
+          <button class="btn-option" id="btn-numbers" onclick="toggleOption('numbers')"># numbers</button>
+        </div>
+
+        <div class="config-group">
+          <button class="btn-option active" id="mode-time" onclick="setMode('time')"><i class="fa-solid fa-clock"></i> time</button>
+          <button class="btn-option" id="mode-words" onclick="setMode('words')"><i class="fa-solid fa-font"></i> words</button>
+          <button class="btn-option" id="mode-quote" onclick="setMode('quote')"><i class="fa-solid fa-quote-left"></i> quote</button>
+          <button class="btn-option" id="mode-zen" onclick="setMode('zen')"><i class="fa-solid fa-mountain"></i> zen</button>
+          <button class="btn-option" id="mode-custom" onclick="setMode('custom')"><i class="fa-solid fa-wrench"></i> custom</button>
+        </div>
+
+        <div class="config-group" id="sub-config-group"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats-bar-top">
+      <div class="stats-header" id="stats-header">15</div>
+      
+      <!-- Предупреждение Caps Lock -->
+      <div class="caps-warning" id="caps-warning">
+        <i class="fa-solid fa-lock"></i> Caps Lock
+      </div>
+
+      <div class="best-score-badge">
+        <i class="fa-solid fa-trophy"></i>
+        Рекорд: <span id="best-wpm-display">0 WPM</span>
+      </div>
+    </div>
+
+    <div class="test-area-container" onclick="focusInput()">
+      <div class="test-area" id="test-area">
+        <div class="caret" id="caret"></div>
+        <div class="words-wrapper" id="words-wrapper"></div>
+      </div>
+    </div>
+
+    <input type="text" id="hidden-input" autofocus autocomplete="off" capitalize="off">
+
+    <button class="restart-btn" onclick="initTest()">
+      <i class="fa-solid fa-rotate-right"></i> Перезапустить
+    </button>
+  </main>
+
+  <footer>
+    Нажми <key>Tab</key> чтобы мгновенно перезапустить
+  </footer>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-card">
+      <h2 class="modal-title">Результаты</h2>
+      <div class="modal-results-grid">
+        <div class="res-box full">
+          <div class="res-label">Скорость</div>
+          <div class="res-val" id="res-wpm">0 WPM</div>
+        </div>
+        <div class="res-box">
+          <div class="res-label">Точность</div>
+          <div class="res-val" id="res-acc">100%</div>
+        </div>
+        <div class="res-box">
+          <div class="res-label">Ошибки</div>
+          <div class="res-val" id="res-errors">0</div>
+        </div>
+      </div>
+      <button class="modal-btn" onclick="closeModalAndRestart()">Заново</button>
+    </div>
+  </div>
+
+  <script>
+    let config = {
+      language: localStorage.getItem('fast_typing_language') || 'ru',
+      punctuation: false,
+      numbers: false,
+      mode: 'time',
+      timeValue: 15,
+      wordsValue: 25,
+      isCustomVal: false,
+      customText: "Пример кастомного текста для печати на скорость."
+    };
+
+    const wordBanks = {
+      ru: [
+        "без", "более", "быть", "вам", "вас", "весь", "вид", "все", "всего", "всех",
+        "вы", "где", "год", "да", "даже", "два", "дел", "день", "для", "до",
+        "дом", "его", "ее", "если", "есть", "еще", "же", "жизнь", "за", "здесь",
+        "из", "или", "им", "их", "как", "кто", "ли", "лицо", "место", "меня",
+        "мне", "много", "мочь", "мы", "на", "над", "надо", "наш", "не", "него",
+        "ней", "нет", "ни", "ним", "них", "но", "ну", "о", "об", "один",
+        "он", "она", "они", "оно", "от", "по", "под", "при", "про", "раз",
+        "с", "сам", "свой", "себе", "себя", "сказать", "слово", "со", "так", "такой",
+        "там", "те", "тебя", "тем", "теперь", "то", "тогда", "того", "тоже", "только",
+        "том", "тот", "ты", "уже", "человек", "чем", "что", "чтобы", "это",
+        "этот", "этого", "этой", "этом", "эту", "я", "время", "дело", "рука", "глаз",
+        "город", "работа", "конец", "голос", "друг", "земля", "каждый", "какой", "первый", "новый",
+        "хороший", "большой", "другой", "главный", "высокий", "старый", "маленький", "молодой", "русский", "правило",
+        "случай", "сторона", "сила", "вечер", "дорога", "вопрос", "система", "форма", "число", "часть",
+        "ребенок", "понятно", "просто", "можно", "нужно", "хотеть", "знать", "стать", "видеть", "думать",
+        "делать", "говорить", "пойти", "взять", "понять", "понимать", "казаться", "дать", "посмотреть", "спросить",
+        "ответить", "подумать", "увидеть", "остаться", "выйти", "подать", "начать", "прийти", "писать", "читать"
+      ],
+      en: [
+        "the", "be", "of", "and", "a", "to", "in", "he", "have", "it",
+        "that", "for", "they", "with", "as", "not", "on", "she", "at", "by",
+        "this", "we", "you", "do", "but", "from", "or", "which", "one", "would",
+        "all", "will", "there", "say", "who", "make", "when", "can", "more", "if",
+        "no", "man", "out", "other", "so", "what", "time", "up", "go", "about",
+        "than", "into", "could", "state", "only", "new", "year", "some", "take", "come",
+        "these", "know", "see", "use", "get", "like", "then", "first", "any", "work",
+        "now", "may", "such", "give", "over", "think", "most", "even", "find", "day",
+        "also", "after", "way", "many", "must", "look", "before", "great", "back", "through",
+        "long", "where", "much", "should", "well", "people", "down", "own", "just", "because",
+        "good", "each", "those", "feel", "seem", "how", "high", "too", "place", "little",
+        "world", "very", "still", "nation", "hand", "old", "life", "tell", "write", "become",
+        "here", "show", "house", "both", "between", "need", "mean", "call", "develop", "under",
+        "last", "right", "move", "thing", "general", "school", "never", "same", "another", "begin",
+        "while", "number", "part", "turn", "real", "leave", "might", "want", "point", "form", "off", "child", "few", "small", "since", "against", "ask", "late", "home", "interest"
+      ]
+    };
+
+    const quotesDict = {
+      ru: [
+        "Успех — это способность шагать от одной неудачи к другой, не теряя энтузиазма.",
+        "Простота — залог надежности и высочайшей скорости разработки.",
+        "Дисциплина — это решение делать то, что очень не хочется делать, чтобы достичь того, чего очень хочется достичь.",
+        "Качественный код сам по себе является лучшей документацией к проекту."
+      ],
+      en: [
+        "Success is going from failure to failure without losing enthusiasm.",
+        "Simplicity is prerequisite for reliability and speed.",
+        "Discipline is choosing between what you want now and what you want most.",
+        "Clean code always looks like it was written by someone who cares."
+      ]
+    };
+
+    let words = [];
+    let currentWordIdx = 0;
+    let currentLetterIdx = 0;
+    let timer = null;
+    let timeLeft = 0;
+    let isTestRunning = false;
+    let startTime = 0;
+    let totalErrors = 0;
+
+    const hiddenInput = document.getElementById('hidden-input');
+    const wordsWrapper = document.getElementById('words-wrapper');
+    const testArea = document.getElementById('test-area');
+    const caret = document.getElementById('caret');
+    const statsHeader = document.getElementById('stats-header');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const bestWpmDisplay = document.getElementById('best-wpm-display');
+    const capsWarning = document.getElementById('caps-warning');
+
+    function updateBestDisplay() {
+      const best = localStorage.getItem('fast_typing_best_wpm') || 0;
+      bestWpmDisplay.innerText = `${best} WPM`;
+    }
+
+    function setLanguage(lang) {
+      config.language = lang;
+      localStorage.setItem('fast_typing_language', lang);
+      updateLanguageUI();
+      initTest();
+    }
+
+    function updateLanguageUI() {
+      document.getElementById('lang-ru').classList.toggle('active', config.language === 'ru');
+      document.getElementById('lang-en').classList.toggle('active', config.language === 'en');
+    }
+
+    function toggleOption(opt) {
+      config[opt] = !config[opt];
+      document.getElementById(`btn-${opt}`).classList.toggle('active', config[opt]);
+      initTest();
+    }
+
+    function setMode(mode) {
+      config.mode = mode;
+      document.querySelectorAll('.config-group .btn-option').forEach(btn => {
+        if(btn.id.startsWith('mode-')) btn.classList.remove('active');
+      });
+      document.getElementById(`mode-${mode}`).classList.add('active');
+      renderSubConfig();
+      initTest();
+    }
+
+    function promptCustomVal(type) {
+      const msg = type === 'time' ? 'Введите время в секундах:' : 'Введите количество слов:';
+      const def = type === 'time' ? config.timeValue : config.wordsValue;
+      const input = prompt(msg, def);
+      const val = parseInt(input, 10);
+
+      if (!isNaN(val) && val > 0) {
+        if (type === 'time') config.timeValue = val;
+        else config.wordsValue = val;
+        config.isCustomVal = true;
+        renderSubConfig();
+        initTest();
+      }
+    }
+
+    function renderSubConfig() {
+      const subGroup = document.getElementById('sub-config-group');
+      subGroup.innerHTML = '';
+
+      if (config.mode === 'time') {
+        const presets = [15, 30, 60];
+        presets.forEach(val => {
+          const btn = document.createElement('button');
+          btn.className = `btn-option ${!config.isCustomVal && config.timeValue === val ? 'active' : ''}`;
+          btn.innerText = `${val}s`;
+          btn.onclick = () => { config.timeValue = val; config.isCustomVal = false; renderSubConfig(); initTest(); };
+          subGroup.appendChild(btn);
+        });
+
+        const customBtn = document.createElement('button');
+        customBtn.className = `btn-option ${config.isCustomVal ? 'active' : ''}`;
+        customBtn.innerHTML = `<i class="fa-solid fa-wrench"></i> ${config.isCustomVal ? config.timeValue + 's' : ''}`;
+        customBtn.onclick = () => promptCustomVal('time');
+        subGroup.appendChild(customBtn);
+
+      } else if (config.mode === 'words') {
+        const presets = [10, 25, 50];
+        presets.forEach(val => {
+          const btn = document.createElement('button');
+          btn.className = `btn-option ${!config.isCustomVal && config.wordsValue === val ? 'active' : ''}`;
+          btn.innerText = val;
+          btn.onclick = () => { config.wordsValue = val; config.isCustomVal = false; renderSubConfig(); initTest(); };
+          subGroup.appendChild(btn);
+        });
+
+        const customBtn = document.createElement('button');
+        customBtn.className = `btn-option ${config.isCustomVal ? 'active' : ''}`;
+        customBtn.innerHTML = `<i class="fa-solid fa-wrench"></i> ${config.isCustomVal ? config.wordsValue : ''}`;
+        customBtn.onclick = () => promptCustomVal('words');
+        subGroup.appendChild(customBtn);
+      }
+    }
+
+    function shuffleArray(array) {
+      let shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function generateWords(count = 80) {
+      if (config.mode === 'custom') return config.customText.split(' ');
+      if (config.mode === 'quote') {
+        const qList = quotesDict[config.language] || quotesDict.ru;
+        return qList[Math.floor(Math.random() * qList.length)].split(' ');
+      }
+
+      const currentBank = wordBanks[config.language] || wordBanks.ru;
+      let list = [];
+      
+      while (list.length < count) {
+        list = list.concat(shuffleArray(currentBank));
+      }
+      list = list.slice(0, count);
+
+      if (config.numbers || config.punctuation) {
+        list = list.map(w => {
+          let modifiedWord = w;
+          if (config.numbers && Math.random() < 0.15) {
+            modifiedWord = Math.floor(Math.random() * 100).toString();
+          }
+          if (config.punctuation && Math.random() < 0.2) {
+            const marks = [',', '.', '!', '?'];
+            modifiedWord += marks[Math.floor(Math.random() * marks.length)];
+          }
+          return modifiedWord;
+        });
+      }
+
+      return list;
+    }
+
+    function appendWordDOM(wordStr, wIdx) {
+      const wordEl = document.createElement('div');
+      wordEl.className = 'word';
+      wordEl.id = `word-${wIdx}`;
+
+      wordStr.split('').forEach((char, lIdx) => {
+        const letterEl = document.createElement('span');
+        letterEl.className = 'letter';
+        letterEl.id = `l-${wIdx}-${lIdx}`;
+        letterEl.innerText = char;
+        wordEl.appendChild(letterEl);
+      });
+
+      wordsWrapper.appendChild(wordEl);
+    }
+
+    function initTest() {
+      clearInterval(timer);
+      isTestRunning = false;
+      currentWordIdx = 0;
+      currentLetterIdx = 0;
+      totalErrors = 0;
+      testArea.style.transform = `translateY(0px)`;
+      modalOverlay.classList.remove('active');
+
+      const wordCountToGenerate = config.mode === 'words' ? Math.max(config.wordsValue + 10, 80) : Math.max(Math.ceil(config.timeValue * 2.5), 80);
+      words = generateWords(wordCountToGenerate);
+
+      if (config.mode === 'time') {
+        timeLeft = config.timeValue;
+        statsHeader.innerText = timeLeft;
+      } else if (config.mode === 'words') {
+        statsHeader.innerText = `0/${config.wordsValue}`;
+      } else {
+        statsHeader.innerText = '';
+      }
+
+      wordsWrapper.innerHTML = '';
+      words.forEach((w, idx) => appendWordDOM(w, idx));
+
+      hiddenInput.value = '';
+      updateBestDisplay();
+      setTimeout(updateCaret, 20);
+      focusInput();
+    }
+
+    function focusInput() { hiddenInput.focus(); }
+
+    function updateCaret() {
+      const curWord = document.getElementById(`word-${currentWordIdx}`);
+      if (!curWord) return;
+
+      const testAreaRect = testArea.getBoundingClientRect();
+      const letters = curWord.querySelectorAll('.letter:not(.extra)');
+      let targetLeft = 0;
+      let targetTop = 0;
+
+      if (currentLetterIdx < letters.length) {
+        const letter = letters[currentLetterIdx];
+        const rect = letter.getBoundingClientRect();
+        targetLeft = rect.left - testAreaRect.left;
+        targetTop = rect.top - testAreaRect.top;
+      } else {
+        const allWordLetters = curWord.querySelectorAll('.letter');
+        const lastLetter = allWordLetters[allWordLetters.length - 1];
+        if (lastLetter) {
+          const rect = lastLetter.getBoundingClientRect();
+          targetLeft = rect.right - testAreaRect.left;
+          targetTop = rect.top - testAreaRect.top;
+        } else {
+          const rect = curWord.getBoundingClientRect();
+          targetLeft = rect.left - testAreaRect.left;
+          targetTop = rect.top - testAreaRect.top;
+        }
+      }
+
+      caret.style.left = `${targetLeft}px`;
+      caret.style.top = `${targetTop + 4}px`;
+
+      const lineHeight = 44.8;
+      if (targetTop > lineHeight * 1.2) {
+        const scrollOffset = Math.floor(targetTop / lineHeight) * lineHeight;
+        testArea.style.transform = `translateY(-${scrollOffset}px)`;
+      } else {
+        testArea.style.transform = `translateY(0px)`;
+      }
+    }
+
+    function startTest() {
+      if (isTestRunning) return;
+      isTestRunning = true;
+      startTime = Date.now();
+
+      if (config.mode === 'time') {
+        timer = setInterval(() => {
+          timeLeft--;
+          statsHeader.innerText = timeLeft;
+          if (timeLeft <= 0) endTest();
+        }, 1000);
+      }
+    }
+
+    hiddenInput.addEventListener('input', () => {
+      if (!isTestRunning) startTest();
+
+      const curWordStr = words[currentWordIdx];
+      const curWordEl = document.getElementById(`word-${currentWordIdx}`);
+      if (!curWordEl) return;
+
+      const val = hiddenInput.value;
+      const letters = curWordEl.querySelectorAll('.letter:not(.extra)');
+
+      for (let i = 0; i < curWordStr.length; i++) {
+        const letterEl = letters[i];
+        if (!letterEl) continue;
+
+        if (i < val.length) {
+          if (val[i] === curWordStr[i]) {
+            letterEl.className = 'letter correct';
+          } else {
+            if (!letterEl.classList.contains('incorrect')) totalErrors++;
+            letterEl.className = 'letter incorrect';
+          }
+        } else {
+          letterEl.className = 'letter';
+        }
+      }
+
+      let extraLetters = curWordEl.querySelectorAll('.letter.extra');
+      if (val.length > curWordStr.length) {
+        const extraText = val.slice(curWordStr.length);
+        while (extraLetters.length < extraText.length) {
+          const span = document.createElement('span');
+          span.className = 'letter extra';
+          curWordEl.appendChild(span);
+          extraLetters = curWordEl.querySelectorAll('.letter.extra');
+        }
+        for (let i = 0; i < extraLetters.length; i++) {
+          if (i < extraText.length) {
+            extraLetters[i].innerText = extraText[i];
+          } else {
+            extraLetters[i].remove();
+          }
+        }
+      } else {
+        extraLetters.forEach(el => el.remove());
+      }
+
+      currentLetterIdx = val.length;
+      updateCaret();
+    });
+
+    // Отслеживание Caps Lock
+    window.addEventListener('keydown', (e) => {
+      if (e.getModifierState('CapsLock')) {
+        capsWarning.classList.add('active');
+      } else {
+        capsWarning.classList.remove('active');
+      }
+
+      if (e.key === "Tab") {
+        e.preventDefault();
+        initTest();
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        const val = hiddenInput.value;
+        if (val.length === 0) return;
+
+        if (!isTestRunning) startTest();
+
+        currentWordIdx++;
+        currentLetterIdx = 0;
+        hiddenInput.value = '';
+
+        if (config.mode === 'words') {
+          statsHeader.innerText = `${currentWordIdx}/${config.wordsValue}`;
+          if (currentWordIdx >= config.wordsValue) {
+            endTest();
+            return;
+          }
+        }
+
+        if (currentWordIdx >= words.length) {
+          endTest();
+        } else {
+          updateCaret();
+        }
+      }
+
+      if (e.code === 'Backspace' && hiddenInput.value === '' && currentWordIdx > 0) {
+        e.preventDefault();
+        currentWordIdx--;
+        const prevWordEl = document.getElementById(`word-${currentWordIdx}`);
+        let prevTyped = '';
+        prevWordEl.querySelectorAll('.letter').forEach(l => {
+          if (l.classList.contains('correct') || l.classList.contains('incorrect') || l.classList.contains('extra')) {
+            prevTyped += l.innerText;
+          }
+        });
+        hiddenInput.value = prevTyped;
+        currentLetterIdx = prevTyped.length;
+        updateCaret();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (e.getModifierState && !e.getModifierState('CapsLock')) {
+        capsWarning.classList.remove('active');
+      }
+    });
+
+    function endTest() {
+      clearInterval(timer);
+      if (!isTestRunning) return;
+      isTestRunning = false;
+
+      const correctLetters = document.querySelectorAll('.letter.correct').length;
+      const totalTyped = document.querySelectorAll('.letter.correct, .letter.incorrect, .letter.extra').length;
+      
+      let timeSpent = (Date.now() - startTime) / 1000 / 60;
+      if (config.mode === 'time') {
+        const elapsedSeconds = config.timeValue - timeLeft;
+        timeSpent = (elapsedSeconds > 0 ? elapsedSeconds : config.timeValue) / 60;
+      }
+      if (timeSpent < 0.02) timeSpent = 0.02;
+
+      const wpm = Math.round((correctLetters / 5) / timeSpent);
+      const acc = totalTyped > 0 ? Math.round((correctLetters / totalTyped) * 100) : 100;
+
+      const currentBest = parseInt(localStorage.getItem('fast_typing_best_wpm') || '0', 10);
+      if (wpm > currentBest && wpm < 300) {
+        localStorage.setItem('fast_typing_best_wpm', wpm);
+        updateBestDisplay();
+      }
+
+      document.getElementById('res-wpm').innerText = `${wpm} WPM`;
+      document.getElementById('res-acc').innerText = `${acc}%`;
+      document.getElementById('res-errors').innerText = totalErrors;
+
+      modalOverlay.classList.add('active');
+    }
+
+    function closeModalAndRestart() {
+      modalOverlay.classList.remove('active');
+      initTest();
+    }
+
+    renderSubConfig();
+    updateLanguageUI();
+    initTest();
+  </script>
+</body>
+</html>
