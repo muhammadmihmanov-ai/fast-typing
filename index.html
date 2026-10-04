@@ -15,7 +15,10 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
   
   <style>
-    :root {
+    /* --- 10 ТЕМ ОФОРМЛЕНИЯ --- */
+    
+    /* 1. Modern (Марсианский терракот - Тема по умолчанию) */
+    :root, [data-theme="modern"] {
       --bg-color: #1a1514;
       --card-bg: rgba(35, 28, 26, 0.75);
       --main-color: #d97757;
@@ -23,6 +26,108 @@
       --sub-color: #635652;
       --text-color: #e3dedb;
       --error-color: #ff4747;
+    }
+
+    /* 2. Cyberpunk (Неон и Фиолетовый) */
+    [data-theme="cyberpunk"] {
+      --bg-color: #0d0221;
+      --card-bg: rgba(26, 9, 51, 0.75);
+      --main-color: #00f0ff;
+      --main-glow: rgba(0, 240, 255, 0.4);
+      --sub-color: #7b2cbf;
+      --text-color: #ff007f;
+      --error-color: #ff3366;
+    }
+
+    /* 3. Matrix (Классический Зеленый Хакер) */
+    [data-theme="matrix"] {
+      --bg-color: #020b05;
+      --card-bg: rgba(5, 25, 10, 0.75);
+      --main-color: #00ff66;
+      --main-glow: rgba(0, 255, 102, 0.3);
+      --sub-color: #1a5e30;
+      --text-color: #a3f7bf;
+      --error-color: #ff2a2a;
+    }
+
+    /* 4. Dracula (Темный с пурпуром) */
+    [data-theme="dracula"] {
+      --bg-color: #282a36;
+      --card-bg: rgba(40, 42, 54, 0.85);
+      --main-color: #ff79c6;
+      --main-glow: rgba(255, 121, 198, 0.35);
+      --sub-color: #6272a4;
+      --text-color: #f8f8f2;
+      --error-color: #ff5555;
+    }
+
+    /* 5. Nord (Арктический синий) */
+    [data-theme="nord"] {
+      --bg-color: #2e3440;
+      --card-bg: rgba(43, 48, 59, 0.85);
+      --main-color: #88c0d0;
+      --main-glow: rgba(136, 192, 208, 0.35);
+      --sub-color: #4c566a;
+      --text-color: #e5e9f0;
+      --error-color: #bf616a;
+    }
+
+    /* 6. Gold (Стильное Золото) */
+    [data-theme="gold"] {
+      --bg-color: #14120e;
+      --card-bg: rgba(30, 26, 20, 0.85);
+      --main-color: #e5b842;
+      --main-glow: rgba(229, 184, 66, 0.35);
+      --sub-color: #594f3b;
+      --text-color: #f5e8c7;
+      --error-color: #ff4d4d;
+    }
+
+    /* 7. Midnight Ocean (Глубокий Океан) */
+    [data-theme="ocean"] {
+      --bg-color: #0a1128;
+      --card-bg: rgba(12, 27, 62, 0.8);
+      --main-color: #00b4d8;
+      --main-glow: rgba(0, 180, 216, 0.35);
+      --sub-color: #1c4475;
+      --text-color: #ade8f4;
+      --error-color: #ff4a5a;
+    }
+
+    /* 8. Sunset (Закат Калифорнии) */
+    [data-theme="sunset"] {
+      --bg-color: #1c0f1d;
+      --card-bg: rgba(45, 20, 44, 0.8);
+      --main-color: #ff758f;
+      --main-glow: rgba(255, 117, 143, 0.4);
+      --sub-color: #723d46;
+      --text-color: #ffccd5;
+      --error-color: #ff2b4a;
+    }
+
+    /* 9. Minimal White (Чистая Светлая Тема) */
+    [data-theme="light"] {
+      --bg-color: #f4f5f7;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --main-color: #3b82f6;
+      --main-glow: rgba(59, 130, 246, 0.25);
+      --sub-color: #9ca3af;
+      --text-color: #1f2937;
+      --error-color: #ef4444;
+    }
+
+    /* 10. Neon Mint (Свежая Мята) */
+    [data-theme="mint"] {
+      --bg-color: #0b1a17;
+      --card-bg: rgba(16, 41, 36, 0.8);
+      --main-color: #00f5d4;
+      --main-glow: rgba(0, 245, 212, 0.35);
+      --sub-color: #2b5e54;
+      --text-color: #dcfefee4;
+      --error-color: #ff3b5c;
+    }
+
+    :root {
       --font-mono: 'JetBrains Mono', monospace;
       --font-ui: 'Outfit', sans-serif;
     }
@@ -46,11 +151,12 @@
       user-select: none;
       background-image: radial-gradient(circle at 50% 0%, var(--main-glow) 0%, transparent 60%);
       overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
     header {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -86,7 +192,7 @@
       font-family: var(--font-ui);
       font-size: 2.1rem;
       font-weight: 800;
-      color: #ffffff;
+      color: var(--text-color);
       letter-spacing: -0.5px;
     }
 
@@ -108,8 +214,9 @@
       background: var(--card-bg);
       padding: 6px 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(10px);
+      transition: background 0.3s ease, border-color 0.3s ease;
     }
 
     .config-group {
@@ -128,7 +235,7 @@
       margin-left: 4px;
     }
 
-    .btn-option {
+    .btn-option, .theme-select {
       background: transparent;
       border: 1px solid transparent;
       color: var(--sub-color);
@@ -146,21 +253,31 @@
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    .theme-select {
+      outline: none;
+      appearance: none;
+      padding-right: 24px;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22293.4%22%20height%3D%22293.4%22%3E%3Cpath%20fill%3D%22%23635652%22%20d%3D%22M236.4%20129.3L146.7%20219%2057%20129.3b0%200%200%200%200%200l21.2-21.2c4.7-4.7%2012.3-4.7%2017%200l51.5%2051.5%2051.5-51.5c4.7-4.7%2012.3-4.7%2017%200l21.2%2021.2c4.7%204.7%204.7%2012.3%200%2017z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 10px;
+    }
+
+    .theme-select option {
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
     .btn-option i {
       transition: transform 0.25s ease, color 0.25s ease;
     }
 
-    .btn-option:hover {
-      color: #ffffff;
-      background: rgba(217, 119, 87, 0.15);
-      border-color: rgba(217, 119, 87, 0.4);
+    .btn-option:hover, .theme-select:hover {
+      color: var(--text-color);
+      background: var(--main-glow);
+      border-color: var(--main-color);
       transform: translateY(-2px);
-      box-shadow: 0 4px 15px var(--main-glow), 0 0 10px rgba(217, 119, 87, 0.2);
-    }
-
-    .btn-option:hover i {
-      transform: scale(1.15) rotate(-5deg);
-      color: var(--main-color);
+      box-shadow: 0 4px 15px var(--main-glow);
     }
 
     .btn-option.active {
@@ -173,18 +290,11 @@
 
     .btn-option.active i {
       color: #000000;
-      transform: none;
-    }
-
-    .btn-option.active:hover {
-      background: #e28363;
-      box-shadow: 0 0 25px var(--main-glow);
-      transform: translateY(-1px);
     }
 
     main {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -205,15 +315,15 @@
       text-shadow: 0 0 15px var(--main-glow);
     }
 
-    /* Индикатор Caps Lock между Таймером и Рекордом */
+    /* Индикатор Caps Lock между секундами/словами и рекордом */
     .caps-warning {
       position: absolute;
       left: 50%;
-      top: -12px;
+      top: -10px;
       transform: translateX(-50%);
-      background: rgba(217, 119, 87, 0.2);
+      background: var(--main-glow);
       border: 1px solid var(--main-color);
-      color: #ffffff;
+      color: var(--text-color);
       padding: 4px 14px;
       border-radius: 8px;
       font-family: var(--font-ui);
@@ -283,7 +393,7 @@
 
     .letter.correct { color: var(--text-color); }
     .letter.incorrect { color: var(--error-color); text-decoration: underline; }
-    .letter.extra { color: #d94545; opacity: 0.85; }
+    .letter.extra { color: var(--error-color); opacity: 0.85; }
 
     .caret {
       position: absolute;
@@ -336,7 +446,7 @@
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 12, 11, 0.85);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(12px);
       display: flex; justify-content: center; align-items: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 100;
@@ -344,7 +454,7 @@
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
     .modal-card {
-      background: #211b19;
+      background: var(--bg-color);
       border: 1px solid var(--main-color);
       border-radius: 20px;
       padding: 30px;
@@ -355,7 +465,7 @@
       text-align: center;
     }
 
-    .modal-title { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 20px; }
+    .modal-title { font-size: 2rem; font-weight: 800; color: var(--text-color); margin-bottom: 20px; }
     .modal-results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
     .res-box { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 12px; }
     .res-box.full { grid-column: span 2; background: var(--main-glow); }
@@ -370,8 +480,8 @@
     }
 
     .modal-btn:hover {
-      background: #e28363;
       box-shadow: 0 0 15px var(--main-glow);
+      transform: translateY(-2px);
     }
 
     footer { color: var(--sub-color); font-size: 0.85rem; font-family: var(--font-ui); text-align: center; }
@@ -391,6 +501,22 @@
 
     <div class="controls-wrapper">
       <div class="config-bar">
+        <!-- ВЫБОР СТИЛЕЙ / ТЕМ (10 ШТУК) -->
+        <div class="config-group">
+          <select class="theme-select" id="theme-select" onchange="changeTheme(this.value)">
+            <option value="modern">🎨 Modern</option>
+            <option value="cyberpunk">⚡ Cyberpunk</option>
+            <option value="matrix">💻 Matrix</option>
+            <option value="dracula">🦇 Dracula</option>
+            <option value="nord">❄️ Nord</option>
+            <option value="gold">🏆 Gold</option>
+            <option value="ocean">🌊 Ocean</option>
+            <option value="sunset">🌅 Sunset</option>
+            <option value="light">☀️ Light</option>
+            <option value="mint">🌿 Mint</option>
+          </select>
+        </div>
+
         <div class="config-group">
           <button class="btn-option" id="lang-ru" onclick="setLanguage('ru')">RU</button>
           <button class="btn-option" id="lang-en" onclick="setLanguage('en')">EN</button>
@@ -418,7 +544,7 @@
     <div class="stats-bar-top">
       <div class="stats-header" id="stats-header">15</div>
       
-      <!-- Предупреждение Caps Lock -->
+      <!-- Индикатор Caps Lock -->
       <div class="caps-warning" id="caps-warning">
         <i class="fa-solid fa-lock"></i> Caps Lock
       </div>
@@ -470,6 +596,7 @@
 
   <script>
     let config = {
+      theme: localStorage.getItem('fast_typing_theme') || 'modern',
       language: localStorage.getItem('fast_typing_language') || 'ru',
       punctuation: false,
       numbers: false,
@@ -491,47 +618,20 @@
         "он", "она", "они", "оно", "от", "по", "под", "при", "про", "раз",
         "с", "сам", "свой", "себе", "себя", "сказать", "слово", "со", "так", "такой",
         "там", "те", "тебя", "тем", "теперь", "то", "тогда", "того", "тоже", "только",
-        "том", "тот", "ты", "уже", "человек", "чем", "что", "чтобы", "это",
-        "этот", "этого", "этой", "этом", "эту", "я", "время", "дело", "рука", "глаз",
-        "город", "работа", "конец", "голос", "друг", "земля", "каждый", "какой", "первый", "новый",
-        "хороший", "большой", "другой", "главный", "высокий", "старый", "маленький", "молодой", "русский", "правило",
-        "случай", "сторона", "сила", "вечер", "дорога", "вопрос", "система", "форма", "число", "часть",
-        "ребенок", "понятно", "просто", "можно", "нужно", "хотеть", "знать", "стать", "видеть", "думать",
-        "делать", "говорить", "пойти", "взять", "понять", "понимать", "казаться", "дать", "посмотреть", "спросить",
-        "ответить", "подумать", "увидеть", "остаться", "выйти", "подать", "начать", "прийти", "писать", "читать"
+        "том", "тот", "ты", "уже", "человек", "чем", "что", "чтобы", "это"
       ],
       en: [
         "the", "be", "of", "and", "a", "to", "in", "he", "have", "it",
         "that", "for", "they", "with", "as", "not", "on", "she", "at", "by",
         "this", "we", "you", "do", "but", "from", "or", "which", "one", "would",
         "all", "will", "there", "say", "who", "make", "when", "can", "more", "if",
-        "no", "man", "out", "other", "so", "what", "time", "up", "go", "about",
-        "than", "into", "could", "state", "only", "new", "year", "some", "take", "come",
-        "these", "know", "see", "use", "get", "like", "then", "first", "any", "work",
-        "now", "may", "such", "give", "over", "think", "most", "even", "find", "day",
-        "also", "after", "way", "many", "must", "look", "before", "great", "back", "through",
-        "long", "where", "much", "should", "well", "people", "down", "own", "just", "because",
-        "good", "each", "those", "feel", "seem", "how", "high", "too", "place", "little",
-        "world", "very", "still", "nation", "hand", "old", "life", "tell", "write", "become",
-        "here", "show", "house", "both", "between", "need", "mean", "call", "develop", "under",
-        "last", "right", "move", "thing", "general", "school", "never", "same", "another", "begin",
-        "while", "number", "part", "turn", "real", "leave", "might", "want", "point", "form", "off", "child", "few", "small", "since", "against", "ask", "late", "home", "interest"
+        "no", "man", "out", "other", "so", "what", "time", "up", "go", "about"
       ]
     };
 
     const quotesDict = {
-      ru: [
-        "Успех — это способность шагать от одной неудачи к другой, не теряя энтузиазма.",
-        "Простота — залог надежности и высочайшей скорости разработки.",
-        "Дисциплина — это решение делать то, что очень не хочется делать, чтобы достичь того, чего очень хочется достичь.",
-        "Качественный код сам по себе является лучшей документацией к проекту."
-      ],
-      en: [
-        "Success is going from failure to failure without losing enthusiasm.",
-        "Simplicity is prerequisite for reliability and speed.",
-        "Discipline is choosing between what you want now and what you want most.",
-        "Clean code always looks like it was written by someone who cares."
-      ]
+      ru: ["Успех — это способность шагать от одной неудачи к другой, не теряя энтузиазма."],
+      en: ["Success is going from failure to failure without losing enthusiasm."]
     };
 
     let words = [];
@@ -551,6 +651,12 @@
     const modalOverlay = document.getElementById('modal-overlay');
     const bestWpmDisplay = document.getElementById('best-wpm-display');
     const capsWarning = document.getElementById('caps-warning');
+
+    function changeTheme(themeName) {
+      config.theme = themeName;
+      document.documentElement.setAttribute('data-theme', themeName);
+      localStorage.setItem('fast_typing_theme', themeName);
+    }
 
     function updateBestDisplay() {
       const best = localStorage.getItem('fast_typing_best_wpm') || 0;
@@ -831,7 +937,6 @@
       updateCaret();
     });
 
-    // Отслеживание Caps Lock
     window.addEventListener('keydown', (e) => {
       if (e.getModifierState('CapsLock')) {
         capsWarning.classList.add('active');
@@ -928,6 +1033,10 @@
       modalOverlay.classList.remove('active');
       initTest();
     }
+
+    // Инициализация темы из localStorage
+    document.getElementById('theme-select').value = config.theme;
+    changeTheme(config.theme);
 
     renderSubConfig();
     updateLanguageUI();
